@@ -1,0 +1,16 @@
+{% extends "Navigation_Residents.html" %} {% block content %}
+<div class="container-fluid">
+  <div class="card profile-card">
+    <div class="title">
+      PROFILE
+    </div>
+    <div class="card-body">
+      Name: {{details["Name"]}} <br />
+      Email : {{details["Email"]}} <br />
+      FlatNo: {{details["FlatNo"]}} <br />
+      Phone: {{details["PhoneNo"]}} <br />
+    </div>
+  </div>
+</div>
+
+{% endblock %}

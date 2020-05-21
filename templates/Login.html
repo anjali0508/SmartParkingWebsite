@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <title>Smart Parking System</title>
+    <link rel="stylesheet" href="../static/css/Styles.css" />
+    <!-- Bootstrap CDN -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <body>
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <span>SMART PARKING SYSTEM</span>
+        </div>
+      </nav>
+      <div class="container-fluid">
+        <div class="card login-card">
+          <div class="title">
+            LOGIN
+          </div>
+          <div class="card-body">
+            <form>
+              {% set action = "/Login" %}
+              <div class="error text-center" id="error">
+                Invalid username or password
+              </div>
+              <label>Enter Flat Number</label>
+              <input type="text" id="Username" class="form-control" /> <br />
+              <label>Enter Password</label>
+              <input type="password" id="Password" class="form-control" />
+              <br />
+              <input
+                type="button"
+                id="Login"
+                value="LOGIN"
+                class="btn btn-default"
+              />
+            </form>
+          </div>
+        </div>
+      </div>
+    </body>
+    <script>
+      let urlParams = new URLSearchParams(window.location.search);
+      let message = urlParams.get("Message");
+      if (message != null) {
+        document.getElementById("error").style.display = "block";
+      }
+      $("#Login").on("click", event => {
+        let action = "{{action | safe}}";
+        let data = {
+          Username: $("#Username").val(),
+          Password: $("#Password").val()
+        };
+        // console.log(data);
+        $.ajax({
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          url: action,
+          type: "POST",
+          dataType: "json",
+          data: JSON.stringify(data),
+          success: result => {
+            if (result["Login"] == "Failed") {
+              window.location.href =
+                "/Login?Message=Invalid username or password";
+            } else {
+              window.location.href = result["Redirect"];
+            }
+          }
+        });
+      });
+    </script>
+  </head>
+</html>

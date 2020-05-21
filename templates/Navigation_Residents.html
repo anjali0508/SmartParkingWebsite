@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <title>Smart Parking System</title>
+    <link rel="stylesheet" href="../static/css/Styles.css" />
+    <!-- Bootstrap CDN -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <span>SMART PARKING SYSTEM</span>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/Resident">HOME</a></li>
+          <li><a href="/Resident/Profile">PROFILE</a></li>
+          <li data-toggle="modal" data-target="#PasswordModal">
+            <a href="#">CHANGE PASSWORD</a>
+          </li>
+          <li id="Logout"><a href="#">LOGOUT</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      {% block content %} {% endblock %}
+    </div>
+
+    <div id="PasswordModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">CHANGE PASSWORD</h4>
+          </div>
+          <div class="modal-body">
+            <form>
+              {% set action = "/Resident/ChangePassword" %}
+              <div class="error" id="error"></div>
+              <label>Current Password</label>
+              <input
+                type="password"
+                id="currentPassword"
+                class="form-control"
+              />
+              <label>New Password</label>
+              <input type="password" id="newPassword" class="form-control" />
+              <label>Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                class="form-control"
+              />
+              <div class="form-control" style="border:0">
+                <input
+                  type="button"
+                  id="ChangePassword"
+                  value="Change Password"
+                  class="btn btn-default"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Ajax call for logout
+      $("#Logout").on("click", event => {
+        $.ajax({
+          url: "/Logout",
+          type: "GET",
+          success: result => {
+            window.location.href = "/Login";
+          }
+        });
+      });
+      // Ajax call to change password
+      $("#ChangePassword").on("click", event => {
+        let action = "{{action | safe}}";
+        let NewPassword = $("#newPassword").val();
+        let confirmPassword = $("#confirmPassword").val();
+        let currentPassword = $("#currentPassword").val();
+        if (
+          NewPassword == "" ||
+          currentPassword == "" ||
+          confirmPassword == ""
+        ) {
+          document.getElementById("error").innerHTML =
+            "All fields are required";
+          document.getElementById("error").style.display = "block";
+          return;
+        }
+        if (NewPassword != confirmPassword) {
+          document.getElementById("error").innerHTML = "Passwords do not match";
+          document.getElementById("error").style.display = "block";
+          return;
+        } else {
+          let data = {
+            NewPassword: NewPassword,
+            CurrentPassword: $("#currentPassword").val()
+          };
+
+          $.ajax({
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            url: action,
+            type: "PATCH",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: result => {
+              alert(result["Message"]);
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+{% extends "Navigation_Admin.html" %} {% block content %}
+<div class="parent">
+  <div class="container">
+    <div class="title">
+      RESIDENT VEHICLE DETAILS
+    </div>
+    {% if vehicleCount > 0 %}
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>FLAT NO.</th>
+            <th>VEHICLE NO.</th>
+            <th>ALLOTTED SLOT</th>
+          </tr>
+        </thead>
+        {% for i in range(vehicleCount) %}
+        <tbody>
+          <tr>
+            <td>{{vehicles[i]["FlatNo"]}}</td>
+            <td>{{vehicles[i]["VehicleNo"]}}</td>
+            <td>{{vehicles[i]["AllottedSlot"]}}</td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+    </div>
+    {% else %}
+    <div class="message">
+      No vehicles registered
+    </div>
+    {% endif %}
+  </div>
+  <div class="formButtons container-fluid">
+    <button data-toggle="modal" data-target="#AddModal">ADD VEHICLE</button>
+    <button data-toggle="modal" data-target="#DeleteModal">
+      DELETE VEHICLE
+    </button>
+  </div>
+</div>
+
+<div id="AddModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">ADD VEHICLE</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          {% set action = "ResidentVehicles" %}
+          <div class="error" id="error_add">
+            All fields are required
+          </div>
+          <label>Flat Number</label>
+          <input type="text" id="FlatNo" class="form-control" />
+          <label>Vehicle NUmber</label>
+          <input type="text" id="VehicleNo" class="form-control" />
+          <label>Allotted Slot</label>
+          <input type="text" id="AllottedSlot" class="form-control" />
+          <div class="form-control" style="border:0">
+            <input
+              type="button"
+              id="AddVehicle"
+              value="Add Vehicle"
+              class="btn btn-default"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="DeleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">
+          &times;
+        </button>
+        <h4 class="modal-title">DELETE VEHICLE</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          {% set action = "ResidentVehicles" %}
+          <div class="error" id="error_del">
+            Vehicle Number is required
+          </div>
+          <label>VehicleNo</label>
+          <input type="text" id="VehicleNo_del" class="form-control" />
+          <div class="form-control" style="border:0">
+            <input
+              type="button"
+              id="DeleteVehicle"
+              value="Delete Vehicle"
+              class="btn btn-default"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Alerts
+  let urlParams = new URLSearchParams(window.location.search);
+  let message = urlParams.get("Message");
+  if (message != null) {
+    alert(message);
+  }
+
+  // Ajax call to add vehicle
+  $("#AddVehicle").on("click", event => {
+    let action = "{{action | safe}}";
+    let data = {
+      FlatNo: $("#FlatNo").val(),
+      VehicleNo: $("#VehicleNo").val(),
+      AllottedSlot: $("#AllottedSlot").val()
+    };
+    if (
+      data["FlatNo"] == "" ||
+      data["AllottedSlot"] == "" ||
+      data["VehicleNo"] == ""
+    ) {
+      document.getElementById("error_add").style.display = "block";
+      return;
+    }
+
+    $.ajax({
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      url: action,
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(data),
+      success: result => {
+        if (result["Success"] == false) {
+          window.location.href =
+            "/Admin/ResidentVehicles?Message=" + result["Message"];
+        } else {
+          window.location.href = "/Admin/ResidentVehicles";
+        }
+      }
+    });
+  });
+
+  // Ajax call to delete vehicle
+  $("#DeleteVehicle").on("click", event => {
+    let action = "{{action | safe}}";
+    let data = { VehicleNo: $("#VehicleNo_del").val() };
+    if (data["VehicleNo"] == "") {
+      document.getElementById("error_del").style.display = "block";
+      return;
+    }
+    $.ajax({
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      url: action,
+      type: "DELETE",
+      dataType: "json",
+      data: JSON.stringify(data),
+      success: result => {
+        // console.log(result);
+        if (result["Success"] == false) {
+          window.location.href =
+            "/Admin/ResidentVehicles?Message=" + result["Message"];
+        } else {
+          window.location.href = "/Admin/ResidentVehicles";
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

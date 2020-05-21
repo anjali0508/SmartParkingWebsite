@@ -1,0 +1,172 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
+    />
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css" rel="stylesheet" /> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style>
+      .row {
+        padding: 1%;
+      }
+
+      .card-content {
+        padding: 2%;
+      }
+
+      .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+        font-size: large;
+        background-color: #233142;
+        color: honeydew;
+      }
+
+      body {
+        background-image: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+      }
+
+      .navbar-brand {
+        padding-top: 5px !important;
+        padding-bottom: 0 !important;
+        height: 30px;
+      }
+
+      .navbar {
+        min-height: 30px !important;
+      }
+    </style>
+    <div>
+      {% block style %} {% endblock %}
+    </div>
+  </head>
+
+  <body>
+    <!-- navigation bar -->
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a
+            class="navbar-brand"
+            href="#"
+            style="margin-top: 5%; font-size: xx-large ;color: greenyellow;"
+            >Belvedere Gardens</a
+          >
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+          <li
+            class="nav-link"
+            href="#myModal"
+            data-toggle="modal"
+            data-target="#myModalPassword"
+          >
+            <a href="#">Change Password</a>
+          </li>
+          <li class="active"><a href="#">Home</a></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"
+              >Welcome <span class="caret"></span
+            ></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="modal fade" id="myModalPassword" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">
+                &times;
+              </button>
+              <h5 class="modal-title">Change Password</h5>
+            </div>
+            <div class="modal-body">
+              <div class="ChangePassword">
+                {%set action = "/Resident/ChangePassword"%}
+                <form>
+                  <label for="currentPassword">Enter Current Password</label>
+                  <input
+                    type="password"
+                    id="currentPassword"
+                    name="curretntPassword"
+                  /><br />
+                  <label for="newPassword">Enter New Password</label>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    name="newPassword"
+                  /><br />
+                  <label for="confirmPassword">Confirm New Password</label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                  /><br />
+                  <input
+                    type="button"
+                    id="ChangePassword"
+                    value="Change Password"
+                  />
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      {% block content %} {% endblock %}
+    </div>
+    <script>
+      // Ajax call to change password
+      $("#ChangePassword").on("click", event => {
+        let action = "{{action | safe}}";
+        let NewPassword = $("#newPassword").val();
+        let confirmPassword = $("#confirmPassword").val();
+        if (NewPassword != confirmPassword) {
+          alert("Passwords do not match");
+        } else {
+          let data = {
+            NewPassword: NewPassword,
+            CurrentPassword: $("#currentPassword").val()
+          };
+
+          $.ajax({
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            url: action,
+            type: "PATCH",
+            dataType: "json",
+            data: JSON.stringify(data),
+            success: result => {
+              alert(result["Message"]);
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

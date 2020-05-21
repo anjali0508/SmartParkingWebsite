@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>Smart Parking System</title>
+    <link rel="stylesheet" href="../static/css/Styles.css" />
+    <!-- Bootstrap CDN -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <span>SMART PARKING SYSTEM</span>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/Admin/Residents">RESIDENTS</a></li>
+          <li><a href="/Admin/ResidentVehicles">VEHICLES</a></li>
+          <li id="Logout"><a href="#">LOGOUT</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    {% block content %} {% endblock %}
+
+    <script>
+      $("#Logout").on("click", event => {
+        $.ajax({
+          url: "/Logout",
+          type: "GET",
+          success: result => {
+            window.location.href = "/Login";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+{% extends "Navigation_Residents.html" %} {% block content %}
+
+<div class="parent">
+  <div class="container">
+    <div class="title">
+      YOUR VEHICLES
+    </div>
+
+    <div class="container-fluid">
+      <div class="resident-deck row">
+        {% if vehicleCount > 0 %} {% for i in range(vehicleCount) %}
+        <div class="card col-sm-3 text-center">
+          <div class="card-body">
+            <div class="card-title">
+              VEHICLE {{i + 1}}
+            </div>
+            <div class="card-text">
+              Vehicle Number: {{vehicles[i]["VehicleNo"]}} <br />
+              Allotted Slot: {{vehicles[i]["AllottedSlot"]}}
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <div class="card col-sm-4 text-center">
+          <div class="card-text">
+            You have not registered any vehicles. <br />
+            Please contact Admin to register.
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="title">
+      VISITORS
+    </div>
+    <div class="container-fluid">
+      <div class="resident-deck row">
+        {% if visitorCount > 0 %} {% for i in range(visitorCount) %}
+        <div class="card col-sm-3 text-center">
+          <div class="card-body">
+            <div class="card-title">
+              VISITOR {{i + 1}}
+            </div>
+            <div class="card-text">
+              Vehicle Number: {{visitorVehicles[i]["VehicleNo"]}} <br />
+              Name: {{visitorVehicles[i]["Name"]}}
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <div class="card col-sm-4 text-center">
+          <div class="card-text">
+            You are not expecting any visitors
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="formButtons container-fluid">
+    <button data-toggle="modal" data-target="#AddModal">ADD VISITOR</button>
+    <button data-toggle="modal" data-target="#DeleteModal">
+      DELETE VISITOR
+    </button>
+  </div>
+</div>
+
+<div id="AddModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">
+          &times;
+        </button>
+        <h4 class="modal-title">ADD VISITOR</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          {%set action = "/Resident/Visitor" %}
+          <div class="error" id="error_add">
+            Vehicle Number is required
+          </div>
+          <label>Visitor's Name</label>
+          <input type="text" id="Name" class="form-control" />
+          <label>Vehicle Number</label>
+          <input type="text" id="VehicleNo" class="form-control" required />
+          <div class="form-control" style="border:0">
+            <input
+              id="AddVisitor"
+              type="button"
+              class="btn btn-default"
+              value="Add Visitor"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="DeleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">
+          &times;
+        </button>
+        <h4 class="modal-title">DELETE VISITOR</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          {%set action = "/Resident/Visitor" %}
+          <div class="error" id="error_del">
+            Vehicle Number is required
+          </div>
+          <label>Vehicle Number</label>
+          <input type="text" id="VehicleNo_del" class="form-control" required />
+          <div class="form-control" style="border:0">
+            <input
+              id="DeleteVisitor"
+              type="button"
+              class="btn btn-default"
+              value="Delete Visitor"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Alerts
+  let urlParams = new URLSearchParams(window.location.search);
+  let message = urlParams.get("Message");
+  if (message != null) {
+    alert(message);
+  }
+
+  // Ajax call to add visitor
+  $("#AddVisitor").on("click", event => {
+    let action = "{{action | safe}}"; // use the jinja variable action
+    let data = {
+      Name: $("#Name").val(),
+      VehicleNo: $("#VehicleNo").val()
+    };
+    if (data["VehicleNo"] == "") {
+      document.getElementById("error_add").style.display = "block";
+      return;
+    }
+    $.ajax({
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      url: action,
+      type: "POST",
+      dataType: "json",
+      data: JSON.stringify(data),
+      success: result => {
+        window.location.href = "/Resident";
+      }
+    });
+  });
+
+  // Ajax call to delete visitor
+  $("#DeleteVisitor").on("click", event => {
+    let action = "{{action | safe}}"; // use the jinja variable action
+    let data = {
+      VehicleNo: $("#VehicleNo_del").val()
+    };
+
+    if (data["VehicleNo"] == "") {
+      document.getElementById("error_del").style.display = "block";
+      return;
+    }
+
+    $.ajax({
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      url: action,
+      type: "DELETE",
+      dataType: "json",
+      data: JSON.stringify(data),
+      success: result => {
+        if (result["Message"]) {
+          window.location.href = "/Resident?Message=" + result["Message"];
+        } else {
+          window.location.href = "/Resident";
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
